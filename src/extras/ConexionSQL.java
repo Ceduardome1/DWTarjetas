@@ -9,30 +9,27 @@ import java.sql.*;
 public class ConexionSQL {
 	
 private Connection conexion;
-private datosConexion datos;
+private DatosConexion datos;
 
-	public ConexionSQL( datosConexion datos, String usuario, String pass ) throws ErrorConexion {
-		this.datos = datos;
-		NuevaConexion( datos.getHost(), datos.getPuerto(), datos.getBD(), usuario, pass );
+	public ConexionSQL( DatosConexion datos, String usuario, String pass ) throws SQLException {
+		NuevaConexion( datos, usuario, pass );
 	}
 	
 	public Connection getConecion() { return conexion; }
 
-	public void NuevaConexion( String host, short puerto, String nomBD, String usuario, String contraseña ) throws ErrorConexion {
+	public void NuevaConexion( DatosConexion datos, String usuario, String contraseña ) throws SQLException {
 			if( conexion != null ) CerrarConexion();
 		
-		String url = "jdbc:sqlserver://" + host + ":" + puerto + ";databaseName=" + nomBD + ";";
-		
-			try {
-				conexion = DriverManager.getConnection( url, usuario, contraseña );
-			} catch (SQLException e) {
-				throw new ErrorConexion( datos, e.toString() );
-			}
-			
-		datos =	new datosConexion( host, puerto, nomBD );
+		String url = "jdbc:sqlserver://" + datos.getHost() + ":" + datos.getPuerto() + ";databaseName=" + datos.getBD()
+		+ ";encrypt=true;trustServerCertificate=true;";
+	
+		this.datos = new DatosConexion( datos );
+
+		conexion = DriverManager.getConnection( url, usuario, contraseña );
+	
 	}
 	
-	public void CerrarConexion(){ 
+	public void CerrarConexion() { 
 			try {
 				conexion.close();
 			} catch (SQLException e) {
@@ -40,30 +37,12 @@ private datosConexion datos;
 			} 
 	}
 		
-	public void IniciarTransaccion() throws ErrorConexion {
-			try {
-				conexion.setAutoCommit( false ); 
-		
-			} catch (SQLException e) {
-				throw new ErrorConexion( datos, 
-					"Error al iniciar la transacción:\n"
-					+ e.getMessage() 
-				);
-			}
+	public void IniciarTransaccion() throws SQLException {
+		conexion.setAutoCommit( false ); 
 	}
 
-	public void ConfirmarTransaccion() throws ErrorConexion {
-			try {
-				conexion.commit();
-
-			} catch (SQLException e) {
-
-				DeshacerTransaccion();
-				throw new ErrorConexion( datos, 
-					"Error al confirmar la transacción:\n"
-					+ e.getMessage()
-				);
-			}
+	public void ConfirmarTransaccion() throws SQLException {
+			conexion.commit();
 	}
 
 	public void DeshacerTransaccion() {
@@ -74,47 +53,44 @@ private datosConexion datos;
 		}
 	}
 		
-	protected ResultSet ConsultarRegistros( String consulta ) throws ErrorConexion {
+	public ResultSet ConsultarRegistros( String consulta )  throws SQLException {
 		Statement st;
 		ResultSet rs = null;
-			try {
-				st = conexion.createStatement();
-				rs = st.executeQuery( consulta );
-			} catch (SQLException e) {
-				throw new ErrorConexion( datos, e.toString() );
-			}
+		st = conexion.createStatement();
+		rs = st.executeQuery( consulta );
+
 		return rs;
 	}
 	
-	public void CerrarResultSet( ResultSet rs ) throws ErrorConexion {
-		try {
-			Statement stmt = rs.getStatement();
-			rs.close();
-			stmt.close();
-		} catch( SQLException e ) {
-			throw new ErrorConexion( datos, e.toString() );
-		}
+	public void CerrarResultSet( ResultSet rs ) throws SQLException {
+		Statement stmt = rs.getStatement();
+		rs.close();
+		stmt.close();
 	}
 	
-	public void Insertar( String consulta ) throws ErrorConexion {
+	public void Insertar( String consulta ) throws SQLException {
 		ModificarRegistros( consulta );
 	}
 
-	public int Actualizar(String consulta) throws ErrorConexion {
+	public int Actualizar(String consulta)  throws SQLException {
 		return ModificarRegistros( consulta );
 	}
 
-	public int Eliminar(String consulta) throws ErrorConexion {
+	public int Eliminar(String consulta) throws SQLException {
 		return ModificarRegistros( consulta );
 	}
 	
-	private int ModificarRegistros( String consulta ) throws ErrorConexion {
+	private int ModificarRegistros( String consulta ) throws SQLException {
 			try {
 				return conexion.createStatement().executeUpdate( consulta );
 			} catch (SQLException e) {
 				DeshacerTransaccion();
-				throw new ErrorConexion( datos, e.toString() );
+				throw new SQLException( e );
 			}
+	}
+
+	public DatosConexion getDatos() {
+		return datos;
 	}
 	
 }

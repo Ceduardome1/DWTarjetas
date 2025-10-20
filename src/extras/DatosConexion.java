@@ -7,7 +7,7 @@ package extras;
 
 import java.io.Serializable;
 
-public class datosConexion implements Serializable {
+public class DatosConexion implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -15,12 +15,18 @@ public class datosConexion implements Serializable {
 	private final short puerto;
 	private final String BD;
 	
-	public datosConexion( String host, short puerto, String BD ) {
+	public DatosConexion( String host, short puerto, String BD ) {
 		this.host = host;
 		this.puerto = puerto;
 		this.BD=BD;
 	}
 	
+	public DatosConexion(DatosConexion datos) {
+		this.host = datos.host;
+		this.puerto = datos.puerto;
+		this.BD=datos.BD;
+	}
+
 	public String getHost() {
 		return host;
 	}
