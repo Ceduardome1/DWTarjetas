@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class GeneradorAñoChino {
 
-	private static final String dir = "docs/añoChino/",		
+	private static final String dir = "docs/recursos/añoChino/",		
 	rutaAnimales = dir+"animales.csv",
 	rutaFechas = dir+"fechas.csv";
 

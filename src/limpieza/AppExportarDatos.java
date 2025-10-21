@@ -1,8 +1,8 @@
 /*
  * EQUIPO: 
- * -MEZA ESCOBAR CÉSAR EDUARDO.
- * -ELENES TERRAZAS CÉSAR IMANOL.
- * -MACIAS BUSTAMANTE JAIME.
+ * - MEZA ESCOBAR CÉSAR EDUARDO.
+ * - ELENES TERRAZAS CÉSAR IMANOL.
+ * - MACIAS BUSTAMANTE JAIME.
  * ID: 22170724.
  * DOCENTE: DR.CLEMENTE GARCIA GERARDO. 	
  * ENTREGA: 23/10/25. 
@@ -10,12 +10,9 @@
  */
 package limpieza;
 import java.io.*;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import dimensionTiempo.DimensionTiempo;
 import dimensionTiempo.Fecha;
@@ -28,7 +25,7 @@ import extras.Rutinas;
 import extras.DatosConexion;
 
 
-public class AppLimpiezaLigera {
+public class AppExportarDatos {
 	
 	private static final String saltoLinea = "---------------------------------------------------------------------------------------------------------------------------------------------------------------";
 	private static final String host="localhost", bd = "DWTarjetas", user="sa", pass="gestion8.0";
@@ -40,66 +37,48 @@ public class AppLimpiezaLigera {
 	private static String registro = null; 
 	private static String[] campos = null, partesNombre;
 		
-	private static HashMap<String,Integer> mapaPaises, mapaRedes;
 	private static HashSet<String> mapaFechas;
-	private static Integer idPaisAcum, idRedAcum, idPaisAct, idRedAct, 
-	idEmpAct, idClAct;
+	private static Integer idEmpAct, idClAct;
 
 	private static boolean fueColocada;
 	
 	private static final String rutaFuente = "docs/fuentes/SOLICITUDES.CVS";
 		
-			private static final String tablaClientes = "Clientes", tablaEmpleados="Empleados", tablaSolicitudes = "Solicitudes", 
-				tablaPaises="Paises", tablaRedes = "Redes", ControlIds = "ControlIds", tablaDimTiempo="dimensionTiempo", tablaObjetivos = "Objetivos";
+	private static final String tablaClientes = "Clientes", tablaEmpleados="Empleados", 
+		tablaSolicitudes = "Solicitudes", ControlIds = "ControlIds", tablaDimTiempo="dimensionTiempo";
 			
 	private static final String[] 
 		    camposSolicitudes = {
 		        "solIdTarjeta",
 		        "solFecha",
 		        "solColocada",
-		        "solRedId",
-		        "solPaisId",
+		        "solRed",
+		        "solPais",
 		        "solClId",
-		        "solEmpId"
+		        "solEmpId",
+		        "solObjetivo"
 		    },
 
 		    camposEmpleados = {
 		        "empId",
 		        "empNombre",
-		        "empApellidoMat",
 		        "empApellidoPat",
+		        "empApellidoMat",
 		        "empGenero"
 		    },
 
 		    camposClientes = {
 		        "clId",
 		        "clNombre",
+		        "clApellidoPat",
 		        "clApellidoMat",
-		        "clApellidoPat"
 		    },
 
-		    camposPaises = {
-		        "paisId",
-		        "paisNom"
-		    },
-
-		    camposRedes = {
-		        "redId",
-		        "redNombre"
-		    },
-		    
 		    camposControlIds = {
-		    	"idRef",
+		    	"idInicial",
 		    	"tipo"
 			},
-		    
-		    camposObjetivos = {
-		    	"objFecha",
-		    	"objEmpId",
-		    	"objMeta",
-		    	"objColocaciones"
-			},
-		    	    
+		      
 		    camposDimTiempo = {
 		    	"fecha",
 		    	"dia",
@@ -126,8 +105,7 @@ public class AppLimpiezaLigera {
 			};
 				
 	private static String consultaInsercionSolicitudes, consultaInsercionEmpleados, 
-	consultaInsercionClientes, consultaInsercionNombres, 
-	consultaInsercionPaises,consultaInsercionRedes, consultaInsercionDimTiempo;
+	consultaInsercionClientes, consultaInsercionControlIds, consultaInsercionDimTiempo;
 	
 	private static ConexionSQL conexion;
 	
@@ -190,28 +168,14 @@ public class AppLimpiezaLigera {
 		consultaInsercionEmpleados = 
 			armarSentenciaInsercion( tablaEmpleados, camposEmpleados );
 
-
 		consultaInsercionClientes = 
 			armarSentenciaInsercion( tablaClientes , camposClientes );
 
-		consultaInsercionNombres = 
+		consultaInsercionControlIds = 
 			armarSentenciaInsercion( ControlIds, camposControlIds );
-
-		consultaInsercionPaises = 
-			armarSentenciaInsercion( tablaPaises, camposPaises );
-
-		consultaInsercionRedes = 
-			armarSentenciaInsercion( tablaRedes, camposRedes );
 
 		consultaInsercionDimTiempo = 
 			armarSentenciaInsercion( tablaDimTiempo, camposDimTiempo );
-	}
-	
-	private static String armarSentenciaActualizacion( String tabla, String[] campos, String[] valores ) {
-		String salida = "UPDATE "+tabla+ "\nSET ";
-			for ( int i = 0, n=campos.length-1; i <n ; i++ )
-				salida += campos[i] +" = " + valores[i]+", ";
-		return salida + campos[campos.length-1] +" = " + valores[valores.length-1]+"\n";
 	}
 	
 	private static String armarSentenciaInsercion( String tabla, String[] campos ) {
@@ -226,10 +190,8 @@ public class AppLimpiezaLigera {
 		generadorFestivos = new GeneradorFestivos();
 		generadorEstacion = new GeneradorEstacion();
 		
-		mapaPaises = new HashMap<String,Integer>();
-		mapaRedes = new HashMap<String,Integer>();
 		mapaFechas = new HashSet<String>();
-		idPaisAcum=idRedAcum=idPaisAct=idRedAct=idEmpAct=idClAct=0;
+		idEmpAct=idClAct=0;
 	}
 	
 	private static void ExportarSolicitudes( BufferedReader bf ) throws IOException, SQLException {
@@ -242,36 +204,28 @@ public class AppLimpiezaLigera {
 				exportarCampos();
 			}
 			
-		exportarCatalogo( consultaInsercionRedes, mapaRedes );	
-		exportarCatalogo( consultaInsercionPaises, mapaPaises);	
 		bf.close();		
 	}
 	
 	private static void limpiarCampos(){
 		// [ 0 ]: Red, [ 1 ]: Cliente, [ 2 ]: Pais, [ 3 ]: Fecha Solicitud, 
 		// [ 4 ]: Empleado, [ 5 ]: Aceptada?, [ 6 ]: IdTarjeta, [ 7 ]: Objetivo, [8]: Genero
-		campos[0] = campos[0].toUpperCase();
-		idRedAct = null;
-			if( ( idRedAct = mapaRedes.putIfAbsent( campos[0], idRedAcum ) ) == null ) {
-				idRedAct = idRedAcum;
-				idRedAcum++;
-			}
+		campos[0] = "'"+campos[0].toUpperCase()+"'";
 	
 		campos[1] = campos[1].toUpperCase(); 
 			
-		campos[2] = campos[2].toUpperCase();
-		idPaisAct = null;
-			if( ( idPaisAct = mapaPaises.putIfAbsent( campos[2], idPaisAcum ) ) == null ) {
-				idPaisAct = idPaisAcum;
-				idPaisAcum++;
-			}
+		campos[2] = "'"+campos[2].toUpperCase()+"'";
 			
 		fechaAct = new Fecha( campos[3] );
 		
 		campos[4] = campos[4].toUpperCase(); 
 		fueColocada = campos[5].equalsIgnoreCase("Si");
-		campos[5] = fueColocada ? "'Y'":"'N'";
-		campos[6] = Rutinas.CadenaNumerica( campos[6] );
+		
+		campos[6] = Rutinas.CadenaNumerica( campos[6] ); //ID
+		Integer idTarjeta = Integer.parseInt( campos[6] );
+		
+		campos[5] =  idTarjeta > 0 && fueColocada ? "'Y'":"'N'";
+
 		campos[7] = Rutinas.CadenaNumerica( campos[7] );
 		campos[8] = "'"+campos[8].charAt(0)+"'";
 	}
@@ -289,61 +243,19 @@ public class AppLimpiezaLigera {
 	}
 	
 	private static void exportarSolicitudes() throws SQLException {
-		/*	SI HAY IDTARJETA + IDRED + IDPAIS REPETIDOS:
-		SE DARÁ PRIORIDAD A LA QUE FUE COLOCADA.
-		SI NINGUNA FUE COLOCADA NOS QUEDAMOS CON EL ULTIMO.
-		 */
+	/*NO HAY IDS DE TARJETAS REPETIDOS MÁS QUE 0 = NO COLOCADA.*/
+		
 		String [] valoresSolicitudes = new String[] { 
 				campos[6], "'"+fechaAct.toString()+"'", campos[5],
-				""+idRedAct, ""+idPaisAct, ""+idClAct, ""+idEmpAct
-			};
-		
-		String condicion = "WHERE solPaisId = " + idPaisAct
-			+ " AND solRedId = " + idRedAct + " AND solIdTarjeta = "+campos[6];
-		String consultaActualizar =  armarSentenciaActualizacion( tablaSolicitudes, camposSolicitudes, valoresSolicitudes ) + condicion;
+				campos[0], campos[2], ""+idClAct, ""+idEmpAct, campos[7]
+		};
 
-			if( fueColocada ) { //MAXIMA PRIORIDAD.	
-				actualizarSolicitud( consultaActualizar, valoresSolicitudes );
-				return;
-			}
-		
-	//VERIFICAR SI, NO FUE COLOCADA ANTES
-		String consulta = "SELECT solColocada FROM SOLICITUDES\n"
-			+ condicion;
-			
-		ResultSet rs = conexion.ConsultarRegistros( consulta );
-			if( rs.next() ) {
-				String valor = rs.getString("solColocada");
-				System.out.println(valor);
-				conexion.CerrarResultSet( rs );
-				
-				if( valor.equals("Y") )
-					return; // <- DEJAR EL REGISTRO CON COLOCACIÓN.
-				
-				actualizarSolicitud( consultaActualizar, valoresSolicitudes );
-			}
-			else {
-				conexion.CerrarResultSet( rs );
-				exportarDatos( 
-					consultaInsercionSolicitudes,
-					valoresSolicitudes
-				);
-			}
+		exportarDatos( 
+			consultaInsercionSolicitudes,
+			valoresSolicitudes
+		);
 	}
-	
-	private static void actualizarSolicitud( String consultaActualizar, String[] valores ) throws SQLException{
-		System.out.println(consultaActualizar);
-		System.out.println(saltoLinea);
-		
-		int filasAfectadas = conexion.Actualizar( consultaActualizar );
-			if( filasAfectadas == 0 ) {
-				exportarDatos( 
-					consultaInsercionSolicitudes,
-					valores
-				);
-			}
-	}
-	
+
 	private static void partirNombre( String nombre ) throws SQLException {
 		partesNombre = nombre.split( "\\" + ' ' );
 			for (int i = 0; i < partesNombre.length; i++ )
@@ -361,7 +273,7 @@ public class AppLimpiezaLigera {
 		);
 		
 		exportarDatos( 
-				consultaInsercionNombres,
+				consultaInsercionControlIds,
 				new String[] { 
 					""+idClAct, "'C'"
 				}
@@ -381,25 +293,12 @@ public class AppLimpiezaLigera {
 		);
 		
 		exportarDatos( 	
-			consultaInsercionNombres,
+			consultaInsercionControlIds,
 			new String[] { 
 				""+idEmpAct, "'E'"
 			}
 		);
 		idEmpAct++;
-	}
-	
-	
-	private static void exportarCatalogo( 
-			String consultaInsercion, HashMap< String, Integer > mapa 
-	) throws SQLException {
-		for ( Map.Entry<String, Integer> entry : mapa.entrySet() )
-			exportarDatos( 
-					consultaInsercion,
-					new String[] { 
-						""+entry.getValue(), "'"+entry.getKey()+"'"
-					}
-			);
 	}
 
 	private static void exportarDatos ( 
@@ -420,13 +319,13 @@ public class AppLimpiezaLigera {
 				"'"+fechaAct.toString()+"'",
 			    "'"+dt.getDia()+"'",
 			    "'"+dt.getMes()+"'",
-			    String.valueOf( dt.getAño() ),
+			    "'"+dt.getAño()+"'",
 			    "'"+dt.getBimestre()+"'",
 			    "'"+dt.getTrimestre()+"'",
 			    "'"+dt.getCuatrimestre()+"'",
 			    "'"+dt.getSemestre()+"'",
 			    "'"+dt.getSemanaAño()+"'",
-			    String.valueOf( dt.getDiaAño() ),
+			    "'"+dt.getDiaAño()+"'",
 			    "'"+dt.getQuincenaAño()+"'",
 			    "'"+dt.getQuincenaMes()+"'",
 			    "'"+dt.esBisiesto()+"'",

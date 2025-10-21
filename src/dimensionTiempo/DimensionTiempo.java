@@ -68,26 +68,26 @@ public class DimensionTiempo {
 	}
 	
 	public String esBisiesto() {
-		return fecha.esBisiesto()? "Y":"N";
+		return fecha.esBisiesto()? "Sí":"No";
 	}
 
 	public String esQuincena() {
-		return fecha.esQuincena()? "Y":"N";
+		return fecha.esQuincena()? "Sí":"No";
 	}
 	
 	public String esFestivo() {
-		return diaFestivo!=null? "Y":"N";
+		return diaFestivo!=null? "Sí":"No";
 	}
 	
 	public String esFestivoLaboral() {
 		return diaFestivo!=null && diaFestivo.esLaboral()? 
-			"Y":"N";
+			"Sí":"No";
 	}
 	
 	public String esLaboral() {
 			if( codDiaSemana == 0 || codDiaSemana == 6 )
-				return "N";
-		return diaFestivo!=null && diaFestivo.esLaboral()? "Y":"N";
+				return "No";
+		return diaFestivo!=null && diaFestivo.esLaboral()? "Sí":"No";
 	}
 	
 	

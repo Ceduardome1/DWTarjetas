@@ -54,6 +54,7 @@ private DatosConexion datos;
 	}
 		
 	public ResultSet ConsultarRegistros( String consulta )  throws SQLException {
+
 		Statement st;
 		ResultSet rs = null;
 		st = conexion.createStatement();
@@ -82,6 +83,7 @@ private DatosConexion datos;
 	
 	private int ModificarRegistros( String consulta ) throws SQLException {
 			try {
+
 				return conexion.createStatement().executeUpdate( consulta );
 			} catch (SQLException e) {
 				DeshacerTransaccion();
