@@ -12,7 +12,9 @@ package limpieza;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 import dimensionTiempo.DimensionTiempo;
 import dimensionTiempo.Fecha;
@@ -37,23 +39,26 @@ public class AppExportarDatos {
 	private static String registro = null; 
 	private static String[] campos = null, partesNombre;
 		
+	private static HashMap<String,Integer> mapaPaises, mapaRedes;
 	private static HashSet<String> mapaFechas;
-	private static Integer idEmpAct, idClAct;
+	private static Integer idPaisAcum, idRedAcum, idPaisAct, idRedAct, 
+	idEmpAct, idClAct;
 
 	private static boolean fueColocada;
 	
 	private static final String rutaFuente = "docs/fuentes/SOLICITUDES.CVS";
 		
 	private static final String tablaClientes = "Clientes", tablaEmpleados="Empleados", 
-		tablaSolicitudes = "Solicitudes", ControlIds = "ControlIds", tablaDimTiempo="dimensionTiempo";
-			
+		tablaSolicitudes = "Solicitudes", ControlIds = "ControlIds", tablaDimTiempo="dimensionTiempo",
+		tablaPaises="Paises", tablaRedes = "Redes";
+		
 	private static final String[] 
 		    camposSolicitudes = {
 		        "solIdTarjeta",
 		        "solFecha",
 		        "solColocada",
-		        "solRed",
-		        "solPais",
+		        "solRedId",
+		        "solPaisId",
 		        "solClId",
 		        "solEmpId",
 		        "solObjetivo"
@@ -81,8 +86,9 @@ public class AppExportarDatos {
 		      
 		    camposDimTiempo = {
 		    	"fecha",
-		    	"dia",
-		    	"mes",
+		    	"numDia",
+		    	"nomDia",
+		    	"nomMes",
 		    	"año",
 		    	"bimestre",
 		    	"trimestre",
@@ -92,6 +98,7 @@ public class AppExportarDatos {
 		    	"diaAño",
 		    	"quincenaAño",
 		    	"quincenaMes",
+		    	"semanaMes",
 		    	"esBisiesto",
 		    	"esFestivo",
 		    	"esFestivoLaboral",
@@ -102,10 +109,21 @@ public class AppExportarDatos {
 		    	"signoZodiacal",
 		    	"animalChino",
 		    	"elementoChino"
+			},
+		    
+		    camposPaises = {
+		    		"paisId",
+		    		"paisNombre"
+			},
+
+		    camposRedes = {
+		    		"redId",
+		    		"redNombre"
 			};
 				
 	private static String consultaInsercionSolicitudes, consultaInsercionEmpleados, 
-	consultaInsercionClientes, consultaInsercionControlIds, consultaInsercionDimTiempo;
+	consultaInsercionClientes, consultaInsercionControlIds, consultaInsercionDimTiempo,
+	consultaInsercionPaises, consultaInsercionRedes;
 	
 	private static ConexionSQL conexion;
 	
@@ -176,6 +194,12 @@ public class AppExportarDatos {
 
 		consultaInsercionDimTiempo = 
 			armarSentenciaInsercion( tablaDimTiempo, camposDimTiempo );
+		
+		consultaInsercionPaises = 
+			armarSentenciaInsercion( tablaPaises, camposPaises );
+
+		consultaInsercionRedes = 
+			armarSentenciaInsercion( tablaRedes, camposRedes );
 	}
 	
 	private static String armarSentenciaInsercion( String tabla, String[] campos ) {
@@ -189,9 +213,10 @@ public class AppExportarDatos {
 		generadorChino = new GeneradorAñoChino();
 		generadorFestivos = new GeneradorFestivos();
 		generadorEstacion = new GeneradorEstacion();
-		
+		mapaPaises = new HashMap<String, Integer>();
+		mapaRedes = new HashMap<String, Integer>();
 		mapaFechas = new HashSet<String>();
-		idEmpAct=idClAct=0;
+		idRedAcum=idPaisAcum=idEmpAct=idClAct=0;
 	}
 	
 	private static void ExportarSolicitudes( BufferedReader bf ) throws IOException, SQLException {
@@ -204,18 +229,32 @@ public class AppExportarDatos {
 				exportarCampos();
 			}
 			
-		bf.close();		
+		bf.close();
+		exportarCatalogo( consultaInsercionRedes, mapaRedes );	
+		exportarCatalogo( consultaInsercionPaises, mapaPaises);	
 	}
 	
 	private static void limpiarCampos(){
 		// [ 0 ]: Red, [ 1 ]: Cliente, [ 2 ]: Pais, [ 3 ]: Fecha Solicitud, 
 		// [ 4 ]: Empleado, [ 5 ]: Aceptada?, [ 6 ]: IdTarjeta, [ 7 ]: Objetivo, [8]: Genero
-		campos[0] = "'"+campos[0].toUpperCase()+"'";
-	
+		campos[0] = campos[0].toUpperCase();
+		idRedAct = null;
+			if( ( idRedAct = mapaRedes.putIfAbsent( campos[0], idRedAcum ) ) == null ) {
+				idRedAct = idRedAcum;
+				idRedAcum++;
+			}
+		campos[0] = "'"+campos[0]+"'";
+
 		campos[1] = campos[1].toUpperCase(); 
 			
-		campos[2] = "'"+campos[2].toUpperCase()+"'";
-			
+		campos[2] = campos[2].toUpperCase();
+		idPaisAct = null;
+			if( ( idPaisAct = mapaPaises.putIfAbsent( campos[2], idPaisAcum ) ) == null ) {
+				idPaisAct = idPaisAcum;
+				idPaisAcum++;
+			}
+		campos[2] = "'"+campos[2]+"'";
+
 		fechaAct = new Fecha( campos[3] );
 		
 		campos[4] = campos[4].toUpperCase(); 
@@ -247,7 +286,7 @@ public class AppExportarDatos {
 		
 		String [] valoresSolicitudes = new String[] { 
 				campos[6], "'"+fechaAct.toString()+"'", campos[5],
-				campos[0], campos[2], ""+idClAct, ""+idEmpAct, campos[7]
+				""+idRedAct, ""+idPaisAct, ""+idClAct, ""+idEmpAct, campos[7]
 		};
 
 		exportarDatos( 
@@ -301,33 +340,25 @@ public class AppExportarDatos {
 		idEmpAct++;
 	}
 
-	private static void exportarDatos ( 
-		String consultaInsercion, String[] valores 
-	) throws SQLException {
-		String consulta = consultaInsercion + String.join( ", ", valores ) + ");";
-		
-		System.out.println( consulta );
-		System.out.println( saltoLinea );
-		conexion.Insertar( consulta );
-	}
-
 	private static void exportarDimTiempo( 
 		DimensionTiempo dt 
 	) throws SQLException {
 	    
 		String[] valoresDimTiempo = {
 				"'"+fechaAct.toString()+"'",
-			    "'"+dt.getDia()+"'",
-			    "'"+dt.getMes()+"'",
+			    ""+dt.getNumDia(),
+			    "'"+dt.getNomDia()+"'",
+			    "'"+dt.getNomMes()+"'",
 			    "'"+dt.getAño()+"'",
-			    "'"+dt.getBimestre()+"'",
-			    "'"+dt.getTrimestre()+"'",
-			    "'"+dt.getCuatrimestre()+"'",
-			    "'"+dt.getSemestre()+"'",
-			    "'"+dt.getSemanaAño()+"'",
-			    "'"+dt.getDiaAño()+"'",
-			    "'"+dt.getQuincenaAño()+"'",
-			    "'"+dt.getQuincenaMes()+"'",
+			    ""+dt.getBimestre(),
+			    ""+dt.getTrimestre(),
+			    ""+dt.getCuatrimestre(),
+			    ""+dt.getSemestre(),
+			    ""+dt.getSemanaAño(),
+			    ""+dt.getDiaAño(),
+			    ""+dt.getQuincenaAño(),
+			    ""+dt.getQuincenaMes(),
+			    ""+dt.getSemanaMes(),
 			    "'"+dt.esBisiesto()+"'",
 			    "'"+dt.esFestivo()+"'",
 			    "'"+dt.esFestivoLaboral()+"'",
@@ -346,6 +377,29 @@ public class AppExportarDatos {
 			);
 	}
 
+
+	private static void exportarDatos ( 
+		String consultaInsercion, String[] valores 
+	) throws SQLException {
+		String consulta = consultaInsercion + String.join( ", ", valores ) + ");";
+		
+		System.out.println( consulta );
+		System.out.println( saltoLinea );
+		conexion.Insertar( consulta );
+	}
+
+	private static void exportarCatalogo( 
+			String consultaInsercion, HashMap< String, Integer > mapa 
+	) throws SQLException {
+		for ( Map.Entry<String, Integer> entry : mapa.entrySet() )
+			exportarDatos( 
+					consultaInsercion,
+					new String[] { 
+						""+entry.getValue(), "'"+entry.getKey()+"'"
+					}
+			);
+	}
+	
 	public static void main ( String args[] ){
 		
 		conexion = null;

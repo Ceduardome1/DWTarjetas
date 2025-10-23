@@ -46,8 +46,8 @@ BEGIN
         s.solFecha,
         s.solEmpId,
         MAX(s.solObjetivo),
-        COUNT( solClId ),
-		COUNT( DISTINCT solClId ),
+        COUNT( s.solClId ),
+		COUNT( DISTINCT s.solClId ),
         SUM(
 			CASE 
 				WHEN s.solColocada = 'Y' 
@@ -60,7 +60,7 @@ END
 GO	
 
 --ACTUALIZAR REFERENCIAS.
-print '\n-------------------------'
+print '-------------------------'
 print 'ACTUALIZAR REFERENCIAS:'
 BEGIN TRAN
 	BEGIN TRY
@@ -69,9 +69,11 @@ BEGIN TRAN
 
 --INTEGRIDAD REFERENCIAL:
 	ALTER TABLE Solicitudes 
-		ADD CONSTRAINT PK_Sol PRIMARY KEY NONCLUSTERED ( solFecha, solEmpId ),
+	ADD
 		CONSTRAINT FK_Sol_Emp FOREIGN KEY( solEmpId ) REFERENCES Empleados( empId ),
-		CONSTRAINT FK_Sol_Cl FOREIGN KEY( solClId ) REFERENCES Clientes( clId )
+		CONSTRAINT FK_Sol_Cl FOREIGN KEY( solClId ) REFERENCES Clientes( clId ),
+		CONSTRAINT FK_Sol_Pais FOREIGN KEY( solPaisId ) REFERENCES Paises ( paisId ),
+		CONSTRAINT FK_Sol_Red FOREIGN KEY( solRedId ) REFERENCES Redes ( redId )
 
 		COMMIT TRAN
 print 'TRANSACCION EXITOSA'
@@ -85,12 +87,13 @@ print ERROR_MESSAGE()
 GO
 
 --CONTABILIZAR OBJETIVOS.
-print '\n-------------------------'
+print '-------------------------'
 print 'CONTANDO OBJETIVOS:'
 BEGIN TRAN
 	BEGIN TRY
 
 		EXEC miSp_ContabilizarObjetivos
+
 		COMMIT TRAN
 print 'TRANSACCION EXITOSA'
 
@@ -100,4 +103,16 @@ print 'TRANSACCION EXITOSA'
 print 'TRANSACCION DESHECHA'
 print ERROR_MESSAGE()
 	END CATCH
+GO
+
+--MODELO EN ESTRELLA:
+ALTER TABLE Solicitudes 
+ADD 
+	CONSTRAINT FK_Sol_Obj_Fecha_Emp FOREIGN KEY( solFecha, solEmpId ) REFERENCES Objetivos( objFecha, objEmpId ),
+	CONSTRAINT FK_Sol_dimTiempo_Fecha FOREIGN KEY( solFecha ) REFERENCES dimensionTiempo( fecha )
+GO
+
+ALTER TABLE Objetivos 
+ADD 
+	CONSTRAINT FK_Obj_dimTiempo_Fecha FOREIGN KEY( objFecha ) REFERENCES dimensionTiempo( fecha )
 GO

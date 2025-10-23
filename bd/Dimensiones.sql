@@ -17,6 +17,10 @@ ALTER TABLE dimensionPaises
 	ADD CONSTRAINT PK_Paises PRIMARY KEY( paisNombre )
 GO
 
+ALTER TABLE Paises 
+	ADD CONSTRAINT FK_Paises FOREIGN KEY( paisNombre ) REFERENCES dimensionPaises( paisNombre )
+GO
+
 BULK INSERT dimensionPaises
 FROM 'D:\Code\Java\TECNM\TESEBADA\DW_TARJETAS\docs\recursos\Paises.csv'
 WITH
@@ -30,25 +34,27 @@ WITH
 --DIMENSION TIEMPO:
 CREATE TABLE dimensionTiempo (
 	fecha DATE NOT NULL,
-	dia VARCHAR(9) NOT NULL,
-	mes VARCHAR(10) NOT NULL,
-	año CHAR(4) NOT NULL,
-	bimestre CHAR(2) NOT NULL,
-	trimestre CHAR(2) NOT NULL,
-	cuatrimestre CHAR(2) NOT NULL,
-	semestre CHAR(2) NOT NULL,
-	semanaAño CHAR(2) NOT NULL,
-	diaAño CHAR(3) NOT NULL,
-	quincenaAño CHAR(2) NOT NULL,
-	quincenaMes CHAR(2) NOT NULL,
+	numDia TINYINT NOT NULL,
+	nomDia VARCHAR(20) NOT NULL,
+	nomMes VARCHAR(10) NOT NULL,
+	año SMALLINT NOT NULL,
+	bimestre TINYINT NOT NULL,
+	trimestre TINYINT NOT NULL,
+	cuatrimestre TINYINT NOT NULL,
+	semestre TINYINT NOT NULL,
+	semanaAño TINYINT NOT NULL,
+	diaAño SMALLINT NOT NULL,
+	quincenaAño TINYINT NOT NULL,
+	quincenaMes TINYINT NOT NULL,
+	semanaMes TINYINT NOT NULL,
 
-	esBisiesto CHAR(2) NOT NULL,
-	esFestivo CHAR(2) NOT NULL,
-	esFestivoLaboral CHAR(2) NOT NULL,
-	esLaboral CHAR(2) NOT NULL,
-	esQuincena CHAR(2) NOT NULL,
+	esBisiesto CHAR(1) NOT NULL, --Y/'N'
+	esFestivo CHAR(1) NOT NULL,
+	esFestivoLaboral CHAR(1) NOT NULL,
+	esLaboral CHAR(1) NOT NULL,
+	esQuincena CHAR(1) NOT NULL,
 	
-	festejo VARCHAR( 50) NOT NULL,
+	festejo VARCHAR( 50) NULL,
 	estacion VARCHAR( 20) NOT NULL,
 	signoZodiacal VARCHAR( 20) NOT NULL,
 	animalChino VARCHAR( 20) NOT NULL,
@@ -74,25 +80,8 @@ CREATE TABLE Objetivos (
 --	objMetaSuperada
 --  objFaltantes
 )
+
 ALTER TABLE Objetivos 
 	ADD CONSTRAINT PK_Obj PRIMARY KEY( objFecha, objEmpId ),
 	CONSTRAINT FK_Obj_Emp FOREIGN KEY( objEmpId ) REFERENCES Empleados( empId )
 GO
-
-
-/*
-Tabla de hechos para modelar:
-1.- Empleados Que hayan cumplido con la cantidad de tarjetas colocadas en cada fecha.
-
-2.-  Cantidad de tarjetas que le faltaron colocar para cumplir el objetivo por día.
-
-4.- Importes de venta por país
-
-5.-  Importe de venta por nombre empleado. 
-
-NOTA: POR CADA REGISTRO DE SOLICITUD USAR:
-	solFecha DATE NOT NULL,
-	solRed VARCHAR( 20 ) NOT NULL,
-	solPais VARCHAR( 20 ) NOT NULL,
-	solEmpId INT NOT NULL,
-*/

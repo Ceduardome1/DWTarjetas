@@ -85,6 +85,20 @@ WHERE empId = 9
 SELECT * FROM Objetivos
 ORDER BY objColocaciones DESC
 
+SELECT * FROM Objetivos
+ORDER BY objEmpId,objFecha ASC
+
+SELECT objEmpId, COUNT(*) FROM Objetivos
+GROUP BY objEmpId
+ORDER BY COUNT(*) DESC
+
+SELECT solEmpId, solFecha, COUNT(*) FROM Solicitudes
+GROUP BY solEmpId, solFecha
+ORDER BY COUNT(*) DESC
+
+SELECT * FROM EMPLEADOS
+WHERE empId = 145
+
 SELECT empId, empNombre, empApellidoPat, empApellidoMat FROM Empleados
 WHERE empId <> 870
 AND (

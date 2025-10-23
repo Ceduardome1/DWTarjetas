@@ -34,12 +34,28 @@ CREATE NONCLUSTERED INDEX IX_cl_nom2 ON Clientes( clApellidoMat );
 CREATE NONCLUSTERED INDEX IX_cl_nom3 ON Clientes( clApellidoPat );
 GO
 
+CREATE TABLE Redes ( 
+	redId INT NOT NULL,
+	redNombre VARCHAR( 20 ) NOT NULL
+)
+ALTER TABLE Redes 
+	ADD CONSTRAINT PK_Red PRIMARY KEY( redId )
+GO
+
+CREATE TABLE Paises ( 
+	paisId INT NOT NULL,
+	paisNombre VARCHAR( 25 ) NOT NULL
+)
+ALTER TABLE Paises 
+	ADD CONSTRAINT PK_Pais PRIMARY KEY( paisId )
+GO
+
 CREATE TABLE Solicitudes (
 	solIdTarjeta INT NOT NULL,
 	solFecha DATE NOT NULL,
 	solColocada CHAR(2) NOT NULL, --'Y'/'N'
-	solRed VARCHAR( 20 ) NOT NULL,
-	solPais VARCHAR( 20 ) NOT NULL,
+	solRedId INT NOT NULL,
+	solPaisId INT NOT NULL,
 	solClId INT NOT NULL,
 	solEmpId INT NOT NULL,
 	solObjetivo INT NOT NULL

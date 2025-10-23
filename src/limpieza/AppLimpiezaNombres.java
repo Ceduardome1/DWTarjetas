@@ -166,7 +166,6 @@ public class AppLimpiezaNombres {
 					rs.getString( nomCamposNombres[2] )
 				};
 	
-			
 				boolean otroNombreConRepeticiones
 					= partes[0].equals( partes[1] )
 					|| partes[1].equals( partes[2] );
@@ -183,6 +182,7 @@ public class AppLimpiezaNombres {
 
 			if( partesNombresCoincidentes.isEmpty() ) {
 				asignarNuevoId( idAct, tipoAct, nuevoIdAct );
+				//listaAnalizados.add( idAct );
 				return;
 			}
 				

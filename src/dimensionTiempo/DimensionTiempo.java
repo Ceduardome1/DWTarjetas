@@ -22,11 +22,13 @@ public class DimensionTiempo {
 		diaAño = (short) ( calendario.get(Calendar.DAY_OF_YEAR) );
 	}
 	
-	public String getDia() {
+	public String getNomDia() {
 		return diasSemana[ codDiaSemana ];
 	}
-	
-	public String getMes() {
+	public byte getNumDia() {
+		return fecha.getDia();
+	}
+	public String getNomMes() {
 		return meses[ calendario.get( Calendar.MONTH ) ];
 	}
 	
@@ -34,65 +36,69 @@ public class DimensionTiempo {
 		return fecha.getAño();
 	}
 	
-	public String getBimestre() {
-	    return String.format("%02d", ((fecha.getMes() - 1) / 2) + 1);
+	public byte getBimestre() {
+	    return (byte) ( ( ( fecha.getMes() - 1) / 2) + 1 );
 	}
 
-	public String getTrimestre() {
-	    return String.format("%02d", ((fecha.getMes() - 1) / 3) + 1);
+	public byte getTrimestre() {
+	    return (byte) ( ((fecha.getMes() - 1) / 3) + 1);
 	}
 
-	public String getCuatrimestre() {
-	    return String.format("%02d", ((fecha.getMes() - 1) / 4) + 1);
+	public byte getCuatrimestre() {
+	    return (byte) ( ((fecha.getMes() - 1) / 4) + 1);
 	}
 
-	public String getSemestre() {
-	    return String.format("%02d", ((fecha.getMes() - 1) / 6) + 1);
+	public byte getSemestre() {
+	    return (byte) ( ((fecha.getMes() - 1) / 6) + 1);
 	}
 	
-	public String getSemanaAño() {
+	public byte getSemanaMes() {
+	    return (byte) calendario.get(Calendar.WEEK_OF_MONTH);
+	}
+
+	public byte getSemanaAño() {
 		
-		return String.format( "%02d", calendario.get(Calendar.WEEK_OF_YEAR) );
+		return (byte) ( calendario.get(Calendar.WEEK_OF_YEAR) );
 	}
 	
-	public String getDiaAño() {
-		return String.format( "%03d", diaAño );
+	public short getDiaAño() {
+		return diaAño;
 	}
 	
-	public String getQuincenaAño() {
-		return String.format( "%02d", ( (diaAño - 1) / 15 ) + 1 );
+	public byte getQuincenaAño() {
+		return (byte) ( ( (diaAño - 1) / 15 ) + 1 );
 	}
 	
-	public String getQuincenaMes() {
-		return String.format( "%02d", ( (fecha.getMes() - 1) / 15 ) + 1 );
+	public byte getQuincenaMes() {
+		return (byte) ( ( (fecha.getMes() - 1) / 15 ) + 1 );
 	}
 	
 	public String esBisiesto() {
-		return fecha.esBisiesto()? "Sí":"No";
+		return fecha.esBisiesto()? "Y":"N";
 	}
 
 	public String esQuincena() {
-		return fecha.esQuincena()? "Sí":"No";
+		return fecha.esQuincena()? "Y":"N";
 	}
 	
 	public String esFestivo() {
-		return diaFestivo!=null? "Sí":"No";
+		return diaFestivo!=null? "Y":"N";
 	}
 	
 	public String esFestivoLaboral() {
 		return diaFestivo!=null && diaFestivo.esLaboral()? 
-			"Sí":"No";
+			"Y":"N";
 	}
 	
 	public String esLaboral() {
 			if( codDiaSemana == 0 || codDiaSemana == 6 )
-				return "No";
-		return diaFestivo!=null && diaFestivo.esLaboral()? "Sí":"No";
+				return "N";
+		return diaFestivo!=null && diaFestivo.esLaboral()? "Y":"N";
 	}
 	
 	
 	public String getFestejo() {
-		return diaFestivo!=null? diaFestivo.getFestejo() : "Ninguno";
+		return diaFestivo!=null? diaFestivo.getFestejo() : null;
 	}
 	
 	public String getEstacion( GeneradorEstacion generadorEstacion ) {
