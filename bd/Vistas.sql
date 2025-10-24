@@ -34,7 +34,10 @@ SELECT
 FROM dimensionTiempo
 GO
 
-SELECT * FROM VW_dimensionTiempo
+CREATE VIEW VW_dimensionPais AS
+SELECT 
+
+
 
 CREATE VIEW VW_EMPLEADOS AS
 SELECT 
@@ -75,14 +78,28 @@ SELECT
 FROM Objetivos
 GO
 
---TABLA HECHOS
-CREATE VIEW VW_HECHOS_SOLICITUDES_OBJETIVOS AS
+CREATE VIEW VW_HECHOS_TRANSACCIONES AS
 SELECT 
-    solFecha,
-    solEmpId,
-	solRedId,
-	solPaisId,
-	solClId,
+--  t.tranIdTarjeta,
+    s.solEmpId AS tranEmpIdEmisor,
+    s.solRedId AS tranRedId,
+    
+    t.tranFecha,
+    t.tranPaisId,
+    t.tranImporte
+FROM Transacciones t
+INNER JOIN Solicitudes s
+ON t.tranIdTarjeta = s.solIdTarjeta
+GO
+
+--TABLA HECHOS
+CREATE VIEW VW_HECHOS_COLOCACIONES AS
+SELECT 
+    s.solFecha,
+    s.solEmpId,
+	s.solRedId,
+	s.solPaisId,
+	s.solClId,
 
     o.objMeta,
     o.objClientesAtendidos,
@@ -91,12 +108,18 @@ SELECT
     o.objMetaAlcanzada,
     o.objMetaSuperada,
     o.objFaltantes
+
 FROM 
     Solicitudes AS s
     INNER JOIN VW_Objetivos AS o 
         ON s.solEmpId = o.objEmpId 
         AND s.solFecha = o.objFecha
+
 GO
 
-SELECT * FROM VW_HECHOS_SOLICITUDES_OBJETIVOS
+SELECT * FROM VW_HECHOS_COLOCACIONES
+
+SELECT * FROM VW_HECHOS_TRANSACCIONES
+
+SELECT * FROM VW_dimensionTiempo
 GO

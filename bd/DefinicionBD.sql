@@ -51,7 +51,7 @@ ALTER TABLE Paises
 GO
 
 CREATE TABLE Solicitudes (
-	solIdTarjeta INT NOT NULL,
+	solIdTarjeta INT NULL,
 	solFecha DATE NOT NULL,
 	solColocada CHAR(2) NOT NULL, --'Y'/'N'
 	solRedId INT NOT NULL,
@@ -60,11 +60,27 @@ CREATE TABLE Solicitudes (
 	solEmpId INT NOT NULL,
 	solObjetivo INT NOT NULL
 )
-
+CREATE CLUSTERED INDEX IX_Sol_Fecha ON Solicitudes( solFecha ) 
+CREATE NONCLUSTERED INDEX IX_Sol_Tarjeta ON Solicitudes( solIdTarjeta ) 
 CREATE NONCLUSTERED INDEX IX_Sol_Emp ON Solicitudes( solEmpId ) 
 CREATE NONCLUSTERED INDEX IX_Sol_Cl ON Solicitudes( solClId )
+CREATE NONCLUSTERED INDEX IX_Sol_Pais ON Solicitudes( solPaisId )
+CREATE NONCLUSTERED INDEX IX_Sol_Red ON Solicitudes( solRedId )
 GO
 
+CREATE TABLE Transacciones (
+	tranIdTarjeta INT NOT NULL,
+	tranFecha DATE NOT NULL,
+	tranPaisId INT NOT NULL,
+	tranImporte NUMERIC( 6, 2 ) NOT NULL
+)
+
+CREATE CLUSTERED INDEX IX_Tran_Fecha ON Transacciones( tranFecha ) 
+CREATE NONCLUSTERED INDEX IX_Tran_Tarjeta ON Transacciones( tranIdTarjeta ) 
+CREATE NONCLUSTERED INDEX IX_Tran_Pais ON Transacciones( tranPaisId )
+GO
+
+GO
 --TABLA AUXILIAR:
 CREATE TABLE ControlIds (
 	idInicial INT NOT NULL,

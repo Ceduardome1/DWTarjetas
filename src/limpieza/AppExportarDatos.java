@@ -33,7 +33,7 @@ public class AppExportarDatos {
 	private static final String host="localhost", bd = "DWTarjetas", user="sa", pass="gestion8.0";
 	private static final short puerto = 1433;
 	
-	private static final int nCamposFuente= 9;
+	private static final int nCamposSolicitudes= 9, nCamposTransacciones = 4;
 	private static final char separador = ',';
 	
 	private static String registro = null; 
@@ -43,16 +43,21 @@ public class AppExportarDatos {
 	private static HashSet<String> mapaFechas;
 	private static Integer idPaisAcum, idRedAcum, idPaisAct, idRedAct, 
 	idEmpAct, idClAct;
-
-	private static boolean fueColocada;
 	
-	private static final String rutaFuente = "docs/fuentes/SOLICITUDES.CVS";
+	private static final String dirFuentes="docs/fuentes/", rutaSolicitudes = dirFuentes+"SOLICITUDES.CVS", rutaTransacciones = dirFuentes+"transacciones.cvs";
 		
 	private static final String tablaClientes = "Clientes", tablaEmpleados="Empleados", 
 		tablaSolicitudes = "Solicitudes", ControlIds = "ControlIds", tablaDimTiempo="dimensionTiempo",
-		tablaPaises="Paises", tablaRedes = "Redes";
+		tablaTransacciones="Transacciones", tablaPaises="Paises", tablaRedes = "Redes";
 		
 	private static final String[] 
+			camposTransacciones = {
+				"tranIdTarjeta",
+				"tranFecha",
+				"tranPaisId",
+				"tranImporte"	
+			},
+			
 		    camposSolicitudes = {
 		        "solIdTarjeta",
 		        "solFecha",
@@ -123,7 +128,7 @@ public class AppExportarDatos {
 				
 	private static String consultaInsercionSolicitudes, consultaInsercionEmpleados, 
 	consultaInsercionClientes, consultaInsercionControlIds, consultaInsercionDimTiempo,
-	consultaInsercionPaises, consultaInsercionRedes;
+	consultaInsercionTransacciones, consultaInsercionPaises, consultaInsercionRedes;
 	
 	private static ConexionSQL conexion;
 	
@@ -179,7 +184,6 @@ public class AppExportarDatos {
 	
 	
 	private static void prepararInserciones() {
-		campos = new String[ nCamposFuente ];
 		consultaInsercionSolicitudes = 
 			armarSentenciaInsercion( tablaSolicitudes, camposSolicitudes );
 
@@ -195,13 +199,16 @@ public class AppExportarDatos {
 		consultaInsercionDimTiempo = 
 			armarSentenciaInsercion( tablaDimTiempo, camposDimTiempo );
 		
+		consultaInsercionTransacciones = 
+				armarSentenciaInsercion( tablaTransacciones, camposTransacciones );
+		
 		consultaInsercionPaises = 
 			armarSentenciaInsercion( tablaPaises, camposPaises );
 
 		consultaInsercionRedes = 
 			armarSentenciaInsercion( tablaRedes, camposRedes );
 	}
-	
+
 	private static String armarSentenciaInsercion( String tabla, String[] campos ) {
 		return "INSERT INTO " + tabla + 
 			" ( " + String.join(", ", campos) + " )\nVALUES ( ";
@@ -219,22 +226,43 @@ public class AppExportarDatos {
 		idRedAcum=idPaisAcum=idEmpAct=idClAct=0;
 	}
 	
-	private static void ExportarSolicitudes( BufferedReader bf ) throws IOException, SQLException {
-		prepararInserciones();
-		iniciarComponentes();
+	private static void exportarDatos ( 
+		String consultaInsercion, String[] valores 
+	) throws SQLException {
+		String consulta = consultaInsercion 
+			+ String.join( ", ", valores ) + ");";
 		
+		System.out.println( consulta );
+		System.out.println( saltoLinea );
+		conexion.Insertar( consulta );
+	}
+	
+	
+	private static void exportarCatalogo( 
+			String consultaInsercion, HashMap< String, Integer > mapa 
+	) throws SQLException {
+		for ( Map.Entry<String, Integer> entry : mapa.entrySet() )
+			exportarDatos( 
+					consultaInsercion,
+					new String[] { 
+						""+entry.getValue(), "'"+entry.getKey()+"'"
+					}
+			);
+	}
+	
+	private static void ExportarSolicitudes( BufferedReader bf ) throws IOException, SQLException {
+		campos = new String[ nCamposSolicitudes ];
+
 			while( ( registro=bf.readLine() )!= null ) {
 				campos = registro.split( "\\" + separador );
-				limpiarCampos();
-				exportarCampos();
+				limpiarCamposSolicitudes();
+				exportarCamposSolicitudes();
 			}
 			
 		bf.close();
-		exportarCatalogo( consultaInsercionRedes, mapaRedes );	
-		exportarCatalogo( consultaInsercionPaises, mapaPaises);	
 	}
 	
-	private static void limpiarCampos(){
+	private static void limpiarCamposSolicitudes(){
 		// [ 0 ]: Red, [ 1 ]: Cliente, [ 2 ]: Pais, [ 3 ]: Fecha Solicitud, 
 		// [ 4 ]: Empleado, [ 5 ]: Aceptada?, [ 6 ]: IdTarjeta, [ 7 ]: Objetivo, [8]: Genero
 		campos[0] = campos[0].toUpperCase();
@@ -258,18 +286,21 @@ public class AppExportarDatos {
 		fechaAct = new Fecha( campos[3] );
 		
 		campos[4] = campos[4].toUpperCase(); 
-		fueColocada = campos[5].equalsIgnoreCase("Si");
 		
 		campos[6] = Rutinas.CadenaNumerica( campos[6] ); //ID
 		Integer idTarjeta = Integer.parseInt( campos[6] );
+			
+			if( idTarjeta == 0 ) {
+				campos[6] = "NULL";
+				campos[5] = "'N'";
+			}
+			else campos[5] = "'Y'";
 		
-		campos[5] =  idTarjeta > 0 && fueColocada ? "'Y'":"'N'";
-
 		campos[7] = Rutinas.CadenaNumerica( campos[7] );
 		campos[8] = "'"+campos[8].charAt(0)+"'";
 	}
 	
-	private static void exportarCampos() 
+	private static void exportarCamposSolicitudes() 
 		throws SQLException {
 		exportarSolicitudes();
 		exportarClientes();
@@ -364,7 +395,8 @@ public class AppExportarDatos {
 			    "'"+dt.esFestivoLaboral()+"'",
 			    "'"+dt.esLaboral()+"'",
 			    "'"+dt.esQuincena()+"'",
-			    "'"+dt.getFestejo()+"'",
+			    dt.getFestejo()== null? 
+					null : "'"+dt.getFestejo()+"'",
 			    "'"+dt.getEstacion(generadorEstacion)+"'",
 			    "'"+dt.getSignoZodiacal( generadorSignoZodiaco )+"'",
 			    "'"+dt.getAnimalChino(generadorChino)+"'",
@@ -377,44 +409,90 @@ public class AppExportarDatos {
 			);
 	}
 
+	private static void ExportarTransacciones( BufferedReader bf ) throws IOException, SQLException {
+		campos = new String[ nCamposTransacciones ];
+			while( ( registro=bf.readLine() )!= null ) {
+				campos = registro.split( "\\" + separador );
+				limpiarCamposTransacciones();
+				exportarCamposTransacciones();
+			}
+			
+		bf.close();
+	}
+	
+	private static void limpiarCamposTransacciones(){
+	// [ 0 ]: idTarjeta, [ 1 ]: fecha, [ 2 ]: Pais, [3]: Importe. 
+		campos[0] =  Rutinas.CadenaNumerica( campos[0] );
 
-	private static void exportarDatos ( 
-		String consultaInsercion, String[] valores 
-	) throws SQLException {
-		String consulta = consultaInsercion + String.join( ", ", valores ) + ");";
+		fechaAct = new Fecha( campos[1] );
+
+		campos[2] = campos[2].toUpperCase();
+		idPaisAct = null;
+			if( ( idPaisAct = mapaPaises.putIfAbsent( campos[2], idPaisAcum ) ) == null ) {
+				idPaisAct = idPaisAcum;
+				idPaisAcum++;
+			}
+
+		campos[3] = Rutinas.CadenaNumerica( campos[3] );
 		
-		System.out.println( consulta );
-		System.out.println( saltoLinea );
-		conexion.Insertar( consulta );
+	}
+	
+	private static void exportarCamposTransacciones() 
+		throws SQLException {
+		exportarTransacciones();
+	}
+	
+	
+	private static void exportarTransacciones() throws SQLException {
+
+			exportarDatos( 
+				consultaInsercionTransacciones,
+				new String[] { 
+					campos[0], "'"+fechaAct.toString()+"'",
+					""+idPaisAct, campos[3]
+				}
+			);
+			
+			if( mapaFechas.add( fechaAct.toString() ) )
+				exportarDimTiempo( 
+					new DimensionTiempo( fechaAct, calendario, generadorFestivos )
+				);
+		
 	}
 
-	private static void exportarCatalogo( 
-			String consultaInsercion, HashMap< String, Integer > mapa 
-	) throws SQLException {
-		for ( Map.Entry<String, Integer> entry : mapa.entrySet() )
-			exportarDatos( 
-					consultaInsercion,
-					new String[] { 
-						""+entry.getValue(), "'"+entry.getKey()+"'"
-					}
-			);
+	private static void exportarCatalogos() throws SQLException {
+		exportarCatalogo( consultaInsercionRedes, mapaRedes );	
+		exportarCatalogo( consultaInsercionPaises, mapaPaises);	
 	}
 	
 	public static void main ( String args[] ){
 		
 		conexion = null;
-		BufferedReader bf  = null;	
+		BufferedReader bfSolicitudes  = null;	
+		BufferedReader bfTransacciones  = null;
+		prepararInserciones();
 		
 			try {
 				
-				conexion = new ConexionSQL( new DatosConexion( host, puerto, bd ), user, pass );
-				bf = IniciarBuffer( rutaFuente );
+				iniciarComponentes();
+				bfSolicitudes = IniciarBuffer( rutaSolicitudes );
+				bfTransacciones = IniciarBuffer( rutaTransacciones );
 				
+				conexion = new ConexionSQL( new DatosConexion( host, puerto, bd ), user, pass );
 				conexion.IniciarTransaccion();
 				
-				System.out.println("LECTURA DE SOLICITUDES:");
+				System.out.println("EXPORTAR SOLICITUDES:");
 				System.out.println( saltoLinea );
-				ExportarSolicitudes( bf );
+				ExportarSolicitudes( bfSolicitudes );
+				
+				bfSolicitudes = IniciarBuffer( rutaSolicitudes );
+				System.out.println("EXPORTAR TRANSACCIONES:");
+				System.out.println( saltoLinea );
+				ExportarTransacciones( bfTransacciones );
+				
+				System.out.println("EXPORTAR CATALOGOS:");
+				System.out.println( saltoLinea );
+				exportarCatalogos();
 				
 				conexion.ConfirmarTransaccion();
 			
@@ -447,7 +525,6 @@ public class AppExportarDatos {
 			
 			if( conexion!=null)
 				conexion.CerrarConexion();
-		
     }
 	
 }
