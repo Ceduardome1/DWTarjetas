@@ -37,6 +37,41 @@ BEGIN
 END
 GO
 
+--ACTUALIZAR REFERENCIAS.
+print '-------------------------'
+print 'ACTUALIZAR REFERENCIAS:'
+BEGIN TRAN
+	BEGIN TRY
+
+		EXEC miSp_ActualizarReferencias
+
+		COMMIT TRAN
+print 'TRANSACCION EXITOSA'
+
+	END TRY
+	BEGIN CATCH
+		ROLLBACK TRAN
+print 'TRANSACCION DESHECHA'
+print ERROR_MESSAGE()
+	END CATCH
+GO
+
+--INTEGRIDAD REFERENCIAL:
+ALTER TABLE Solicitudes 
+	ADD
+		CONSTRAINT FK_Sol_Emp FOREIGN KEY( solEmpId ) REFERENCES Empleados( empId ),
+		CONSTRAINT FK_Sol_Cl FOREIGN KEY( solClId ) REFERENCES Clientes( clId ),
+		CONSTRAINT FK_Sol_Pais FOREIGN KEY( solPaisId ) REFERENCES Paises ( paisId ),
+		CONSTRAINT FK_Sol_Red FOREIGN KEY( solRedId ) REFERENCES Redes ( redId ),
+		CONSTRAINT FK_Sol_dimTiempo_Fecha FOREIGN KEY( solFecha ) REFERENCES dimensionTiempo( fecha )
+
+ALTER TABLE Transacciones
+	ADD
+--		CONSTRAINT FK_Sol_Tarjeta FOREIGN KEY( tranIdTarjeta ) REFERENCES Solicitudes ( solIdTarjeta ),
+		CONSTRAINT FK_Tran_Pais FOREIGN KEY( tranPaisId ) REFERENCES Paises ( paisId )
+GO
+
+/*
 CREATE PROCEDURE miSp_ContabilizarObjetivos
 AS
 BEGIN
@@ -59,25 +94,6 @@ BEGIN
 END
 GO	
 
---ACTUALIZAR REFERENCIAS.
-print '-------------------------'
-print 'ACTUALIZAR REFERENCIAS:'
-BEGIN TRAN
-	BEGIN TRY
-
-		EXEC miSp_ActualizarReferencias
-
-		COMMIT TRAN
-print 'TRANSACCION EXITOSA'
-
-	END TRY
-	BEGIN CATCH
-		ROLLBACK TRAN
-print 'TRANSACCION DESHECHA'
-print ERROR_MESSAGE()
-	END CATCH
-GO
-
 --CONTABILIZAR OBJETIVOS.
 print '-------------------------'
 print 'CONTANDO OBJETIVOS:'
@@ -97,23 +113,11 @@ print ERROR_MESSAGE()
 	END CATCH
 GO
 
---INTEGRIDAD REFERENCIAL:
-	ALTER TABLE Solicitudes 
-	ADD
-		CONSTRAINT FK_Sol_Emp FOREIGN KEY( solEmpId ) REFERENCES Empleados( empId ),
-		CONSTRAINT FK_Sol_Cl FOREIGN KEY( solClId ) REFERENCES Clientes( clId ),
-		CONSTRAINT FK_Sol_Pais FOREIGN KEY( solPaisId ) REFERENCES Paises ( paisId ),
-		CONSTRAINT FK_Sol_Red FOREIGN KEY( solRedId ) REFERENCES Redes ( redId ),
-
-		CONSTRAINT FK_Sol_Obj_Fecha_Emp FOREIGN KEY( solFecha, solEmpId ) REFERENCES Objetivos( objFecha, objEmpId ),
-		CONSTRAINT FK_Sol_dimTiempo_Fecha FOREIGN KEY( solFecha ) REFERENCES dimensionTiempo( fecha )
-
-	ALTER TABLE Transacciones
-	ADD
---		CONSTRAINT FK_Sol_Tarjeta FOREIGN KEY( solIdTarjeta ) REFERENCES Transacciones ( tranIdTarjeta ),
-		CONSTRAINT FK_Tran_Pais FOREIGN KEY( tranPaisId ) REFERENCES Paises ( paisId )
-
-	ALTER TABLE Objetivos 
+ALTER TABLE Objetivos 
 	ADD 
 		CONSTRAINT FK_Obj_dimTiempo_Fecha FOREIGN KEY( objFecha ) REFERENCES dimensionTiempo( fecha )
-GO
+
+ALTER TABLE Solicitudes 
+	ADD
+		CONSTRAINT FK_Sol_Obj_Fecha_Emp FOREIGN KEY( solFecha, solEmpId ) REFERENCES Objetivos( objFecha, objEmpId )
+*/

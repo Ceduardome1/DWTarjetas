@@ -34,11 +34,6 @@ SELECT
 FROM dimensionTiempo
 GO
 
-CREATE VIEW VW_dimensionPais AS
-SELECT 
-
-
-
 CREATE VIEW VW_EMPLEADOS AS
 SELECT 
     empId,
@@ -54,30 +49,7 @@ SELECT
 FROM Clientes
 GO
 
-CREATE VIEW VW_Objetivos AS
-SELECT 
-    objFecha, objEmpId, objMeta, objClientesAtendidos, 
-    objClientesDistintosAtendidos, objColocaciones,
-     CASE 
-        WHEN objColocaciones >= objMeta 
-            THEN 'Sí'
-        ELSE 'No'
-    END AS objMetaAlcanzada, 
-
-    CASE 
-        WHEN objColocaciones > objMeta 
-            THEN 'Sí'
-        ELSE 'No'
-    END AS objMetaSuperada, 
-
-    CASE 
-        WHEN ( objMeta - objColocaciones ) < 0
-            THEN 0
-        ELSE objMeta - objColocaciones
-     END AS objFaltantes
-FROM Objetivos
-GO
-
+--ACTIVIDADES DEL NEGOCIO:
 CREATE VIEW VW_HECHOS_TRANSACCIONES AS
 SELECT 
 --  t.tranIdTarjeta,
@@ -92,7 +64,23 @@ INNER JOIN Solicitudes s
 ON t.tranIdTarjeta = s.solIdTarjeta
 GO
 
---TABLA HECHOS
+--COLOCACIONES
+CREATE VIEW VW_Objetivos AS
+SELECT 
+        s.solFecha AS objFecha,
+        s.solEmpId AS objEmpId,
+        MAX(s.solObjetivo) AS objMeta,
+        COUNT( s.solClId ) AS objClientesAtendidos,
+		COUNT( DISTINCT s.solClId ) AS objClientesDistintosAtendidos,
+        SUM(
+			CASE 
+				WHEN s.solColocada = 'Y' 
+			THEN 1 ELSE 0 END
+		) AS objColocaciones
+FROM SOLICITUDES s
+    GROUP BY s.solFecha, s.solEmpId
+GO
+
 CREATE VIEW VW_HECHOS_COLOCACIONES AS
 SELECT 
     s.solFecha,
@@ -101,20 +89,30 @@ SELECT
 	s.solPaisId,
 	s.solClId,
 
-    o.objMeta,
-    o.objClientesAtendidos,
-    o.objClientesDistintosAtendidos,
-    o.objColocaciones,
-    o.objMetaAlcanzada,
-    o.objMetaSuperada,
-    o.objFaltantes
+    o.*,
+    CASE 
+        WHEN objColocaciones >= objMeta 
+        THEN 1
+        ELSE 0
+    END AS objMetaAlcanzada, 
+
+    CASE 
+        WHEN objColocaciones > objMeta 
+        THEN 1
+        ELSE 0
+    END AS objMetaSuperada, 
+
+    CASE 
+        WHEN ( objMeta - objColocaciones ) < 0
+        THEN 0
+        ELSE objMeta - objColocaciones
+    END AS objFaltantes
 
 FROM 
     Solicitudes AS s
     INNER JOIN VW_Objetivos AS o 
         ON s.solEmpId = o.objEmpId 
         AND s.solFecha = o.objFecha
-
 GO
 
 SELECT * FROM VW_HECHOS_COLOCACIONES

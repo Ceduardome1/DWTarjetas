@@ -66,8 +66,9 @@ ADD
 	CONSTRAINT PK_Tiempo PRIMARY KEY( fecha )
 GO
 
+/*
 --DIMENSION OBJETIVOS:
-CREATE TABLE Objetivos (
+CREATE DROP TABLE Objetivos (
 	objFecha DATE NOT NULL,
 	objEmpId INT NOT NULL,
 	objMeta INT NOT NULL,
@@ -85,3 +86,4 @@ ALTER TABLE Objetivos
 	ADD CONSTRAINT PK_Obj PRIMARY KEY( objFecha, objEmpId ),
 	CONSTRAINT FK_Obj_Emp FOREIGN KEY( objEmpId ) REFERENCES Empleados( empId )
 GO
+*/

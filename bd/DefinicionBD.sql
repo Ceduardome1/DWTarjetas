@@ -60,7 +60,8 @@ CREATE TABLE Solicitudes (
 	solEmpId INT NOT NULL,
 	solObjetivo INT NOT NULL
 )
-CREATE CLUSTERED INDEX IX_Sol_Fecha ON Solicitudes( solFecha ) 
+
+CREATE CLUSTERED INDEX IX_Sol_Fecha_Emp ON Solicitudes( solFecha, solEmpId ) 
 CREATE NONCLUSTERED INDEX IX_Sol_Tarjeta ON Solicitudes( solIdTarjeta ) 
 CREATE NONCLUSTERED INDEX IX_Sol_Emp ON Solicitudes( solEmpId ) 
 CREATE NONCLUSTERED INDEX IX_Sol_Cl ON Solicitudes( solClId )
