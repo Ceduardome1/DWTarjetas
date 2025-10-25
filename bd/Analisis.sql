@@ -124,3 +124,5 @@ LEFT JOIN VW_IMPORTES i
 ON s.solIdTarjeta = i.tranIdTarjeta
 WHERE i.tranIdTarjeta IS NULL
 
+SELECT * FROM Solicitudes
+SELECT * FROM ControlIds

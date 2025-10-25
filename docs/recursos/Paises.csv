@@ -1,51 +1,51 @@
-nombre,clima,seguridad,nivel_economico,giro,idioma,moneda,continente
-MEXICO,Calido,Media,Medio,Manufactura,Espanol,Peso Mexicano,America
-USA,Templado,Alta,Alto,Tecnologia,Ingles,Dolar Estadounidense,America
-CANADA,Frio,Alta,Alto,Energia,Ingles y Frances,Dolar Canadiense,America
-BRASIL,Calido,Media,Medio,Agricultura,Portugues,Real,America
-ARGENTINA,Templado,Media,Medio,Agricultura,Espanol,Peso Argentino,America
-CHILE,Templado,Alta,Alto,Mineria,Espanol,Peso Chileno,America
-COLOMBIA,Calido,Media,Medio,Petroleo,Espanol,Peso Colombiano,America
-PERU,Templado,Media,Medio,Mineria,Espanol,Sol Peruano,America
-ALEMANIA,Templado,Alta,Alto,Industria,Aleman,Euro,Europa
-FRANCIA,Templado,Alta,Alto,Turismo,Frances,Euro,Europa
-ITALIA,Templado,Alta,Alto,Turismo,Italiano,Euro,Europa
-ESPANA,Templado,Alta,Alto,Turismo,Espanol,Euro,Europa
-REINO UNIDO,Frio,Alta,Alto,Finanzas,Ingles,Libra Esterlina,Europa
-PAISES BAJOS,Templado,Alta,Alto,Comercio,Neerlandes,Euro,Europa
-SUECIA,Frio,Alta,Alto,Tecnologia,Sueco,Corona Sueca,Europa
-NORUEGA,Frio,Alta,Alto,Energia,Noruego,Corona Noruega,Europa
-FINLANDIA,Frio,Alta,Alto,Tecnologia,Fines,Euro,Europa
-SUIZA,Frio,Alta,Alto,Finanzas,Aleman,Franco Suizo,Europa
-RUSIA,Frio,Media,Medio,Energia,Ruso,Rublo,Europa
-CHINA,Templado,Media,Medio,Manufactura,Chino Yuan,RMB Yuan,Asia
-JAPON,Templado,Alta,Alto,Industria,Japones,Yen,Asia
-COREA DEL SUR,Templado,Alta,Alto,Tecnologia,Coreano,Won,Asia
-INDIA,Calido,Media,Medio,Servicios,Hindi,Rupia India,Asia
-ARABIA SAUDITA,Calido,Media,Alto,Petroleo,Arabe,Riyal Saudi,Asia
-SUDAFRICA,Templado,Media,Medio,Mineria,Ingles,Rand,Africa
-EGIPTO,Calido,Media,Medio,Turismo,Arabe,Libra Egipcia,Africa
-NIGERIA,Calido,Baja,Medio,Petroleo,Ingles,Naira,Africa
-AUSTRALIA,Templado,Alta,Alto,Mineria,Ingles,Dolar Australiano,Oceania
-NUEVA ZELANDA,Templado,Alta,Alto,Agricultura,Ingles,Dolar Neozelandes,Oceania
-INDONESIA,Tropical,Media,Medio,Manufactura,Indonesio,Rupia,Asia
-TAILANDIA,Tropical,Media,Medio,Turismo,Tailandes,Baht,Asia
-VIETNAM,Tropical,Media,Medio,Manufactura,Vietnamita,Dong,Asia
-FILIPINAS,Tropical,Media,Medio,Servicios,Filipino,Peso Filipino,Asia
-MALASIA,Tropical,Alta,Medio,Manufactura,Malayo,Ringgit,Asia
-SINGAPUR,Tropical,Alta,Alto,Finanzas,Ingles,Dolar de Singapur,Asia
-TURQUIA,Templado,Media,Medio,Manufactura,Turco,Lira Turca,Asia
-GRECIA,Templado,Alta,Alto,Turismo,Griego,Euro,Europa
-PORTUGAL,Templado,Alta,Alto,Turismo,Portugues,Euro,Europa
-IRAN,Seco,Media,Medio,Petroleo,Persa,Rial Irani,Asia
-ISRAEL,Templado,Alta,Alto,Tecnologia,Hebreo,Nuevo Shekel,Asia
-EMIRATOS ARABES UNIDOS,Calido,Alta,Alto,Petroleo,Arabe,Dirham,Asia
-QTAR,Calido,Alta,Alto,Petroleo,Arabe,Riyal,Asia
-KUWAIT,Calido,Alta,Alto,Petroleo,Arabe,Dinar,Asia
-PAKISTAN,Seco,Media,Medio,Textiles,Urdu,Rupia Pakistaní,Asia
-BANGLADES,Tropical,Media,Bajo,Textiles,Bengali,Rupia Bangladesi,Asia
-KAZAJISTAN,Frio,Media,Medio,Energia,Kazajo,Tenge,Asia
-SUDAN,Calido,Baja,Bajo,Agricultura,Arabe,Libra Sudanesa,Africa
-KENIA,Tropical,Media,Medio,Agricultura,Ingles,Chelin Keniano,Africa
-MARRUECOS,Templado,Media,Medio,Turismo,Arabe,Dirham,Africa
-VENEZUELA,Tropical,Baja,Bajo,Petroleo,Espanol,Bolivar,America
+nombre,clima,seguridad,nivel_economico,giro,idioma,moneda,continente,equivalente_a_1_usd
+MEXICO,Calido,Media,Medio,Manufactura,Espanol,Peso Mexicano,America,20.0
+USA,Templado,Alta,Alto,Tecnologia,Ingles,Dolar Estadounidense,America,1.0
+CANADA,Frio,Alta,Alto,Energia,Ingles y Frances,Dolar Canadiense,America,1.37
+BRASIL,Calido,Media,Medio,Agricultura,Portugues,Real,America,5.0
+ARGENTINA,Templado,Media,Medio,Agricultura,Espanol,Peso Argentino,America,850.0
+CHILE,Templado,Alta,Alto,Mineria,Espanol,Peso Chileno,America,950.0
+COLOMBIA,Calido,Media,Medio,Petroleo,Espanol,Peso Colombiano,America,3900.0
+PERU,Templado,Media,Medio,Mineria,Espanol,Sol Peruano,America,3.7
+ALEMANIA,Templado,Alta,Alto,Industria,Aleman,Euro,Europa,0.93
+FRANCIA,Templado,Alta,Alto,Turismo,Frances,Euro,Europa,0.93
+ITALIA,Templado,Alta,Alto,Turismo,Italiano,Euro,Europa,0.93
+ESPANA,Templado,Alta,Alto,Turismo,Espanol,Euro,Europa,0.93
+REINO UNIDO,Frio,Alta,Alto,Finanzas,Ingles,Libra Esterlina,Europa,0.79
+PAISES BAJOS,Templado,Alta,Alto,Comercio,Neerlandes,Euro,Europa,0.93
+SUECIA,Frio,Alta,Alto,Tecnologia,Sueco,Corona Sueca,Europa,10.5
+NORUEGA,Frio,Alta,Alto,Energia,Noruego,Corona Noruega,Europa,10.6
+FINLANDIA,Frio,Alta,Alto,Tecnologia,Fines,Euro,Europa,0.93
+SUIZA,Frio,Alta,Alto,Finanzas,Aleman,Franco Suizo,Europa,0.91
+RUSIA,Frio,Media,Medio,Energia,Ruso,Rublo,Europa,92.0
+CHINA,Templado,Media,Medio,Manufactura,Chino Yuan,RMB Yuan,Asia,7.25
+JAPON,Templado,Alta,Alto,Industria,Japones,Yen,Asia,155.0
+COREA DEL SUR,Templado,Alta,Alto,Tecnologia,Coreano,Won,Asia,1370.0
+INDIA,Calido,Media,Medio,Servicios,Hindi,Rupia India,Asia,83.0
+ARABIA SAUDITA,Calido,Media,Alto,Petroleo,Arabe,Riyal Saudi,Asia,3.75
+SUDAFRICA,Templado,Media,Medio,Mineria,Ingles,Rand,Africa,18.0
+EGIPTO,Calido,Media,Medio,Turismo,Arabe,Libra Egipcia,Africa,47.0
+NIGERIA,Calido,Baja,Medio,Petroleo,Ingles,Naira,Africa,1300.0
+AUSTRALIA,Templado,Alta,Alto,Mineria,Ingles,Dolar Australiano,Oceania,1.52
+NUEVA ZELANDA,Templado,Alta,Alto,Agricultura,Ingles,Dolar Neozelandes,Oceania,1.66
+INDONESIA,Tropical,Media,Medio,Manufactura,Indonesio,Rupia,Asia,16000.0
+TAILANDIA,Tropical,Media,Medio,Turismo,Tailandes,Baht,Asia,36.0
+VIETNAM,Tropical,Media,Medio,Manufactura,Vietnamita,Dong,Asia,25000.0
+FILIPINAS,Tropical,Media,Medio,Servicios,Filipino,Peso Filipino,Asia,57.0
+MALASIA,Tropical,Alta,Medio,Manufactura,Malayo,Ringgit,Asia,4.7
+SINGAPUR,Tropical,Alta,Alto,Finanzas,Ingles,Dolar de Singapur,Asia,1.35
+TURQUIA,Templado,Media,Medio,Manufactura,Turco,Lira Turca,Asia,32.0
+GRECIA,Templado,Alta,Alto,Turismo,Griego,Euro,Europa,0.93
+PORTUGAL,Templado,Alta,Alto,Turismo,Portugues,Euro,Europa,0.93
+IRAN,Seco,Media,Medio,Petroleo,Persa,Rial Irani,Asia,42000.0
+ISRAEL,Templado,Alta,Alto,Tecnologia,Hebreo,Nuevo Shekel,Asia,3.7
+EMIRATOS ARABES UNIDOS,Calido,Alta,Alto,Petroleo,Arabe,Dirham,Asia,3.67
+QTAR,Calido,Alta,Alto,Petroleo,Arabe,Riyal,Asia,3.64
+KUWAIT,Calido,Alta,Alto,Petroleo,Arabe,Dinar,Asia,0.31
+PAKISTAN,Seco,Media,Medio,Textiles,Urdu,Rupia Pakistaní,Asia,278.0
+BANGLADES,Tropical,Media,Bajo,Textiles,Bengali,Rupia Bangladesi,Asia,110.0
+KAZAJISTAN,Frio,Media,Medio,Energia,Kazajo,Tenge,Asia,450.0
+SUDAN,Calido,Baja,Bajo,Agricultura,Arabe,Libra Sudanesa,Africa,670.0
+KENIA,Tropical,Media,Medio,Agricultura,Ingles,Chelin Keniano,Africa,130.0
+MARRUECOS,Templado,Media,Medio,Turismo,Arabe,Dirham,Africa,3.67
+VENEZUELA,Tropical,Baja,Bajo,Petroleo,Espanol,Bolivar,America,36.0

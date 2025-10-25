@@ -10,8 +10,10 @@ CREATE TABLE dimensionPaises (
 	paisGiroEconomico VARCHAR(20) NOT NULL,
 	paisIdioma VARCHAR(20) NOT NULL,
 	paisMoneda VARCHAR(20) NOT NULL,
-	paisContinente VARCHAR(20) NOT NULL
-);
+	paisContinente VARCHAR(20) NOT NULL,
+	paisMonedaDolar NUMERIC (10,2)
+	
+)
 
 ALTER TABLE dimensionPaises 
 	ADD CONSTRAINT PK_Paises PRIMARY KEY( paisNombre )

@@ -50,18 +50,32 @@ FROM Clientes
 GO
 
 --ACTIVIDADES DEL NEGOCIO:
+CREATE VIEW VW_IMPORTE_NACIONAL_DOLAR AS
+
+SELECT T.tranPaisId,DP.paisMonedaDolar AS ImporteDolar
+FROM
+    Transacciones T
+JOIN 
+    Paises PS ON T.tranPaisId = PS.paisId
+JOIN 
+    dimensionPaises DP ON PS.paisNombre = DP.paisNombre
+
+GROUP BY T.tranPaisId,DP.paisMonedaDolar
+GO
+
 CREATE VIEW VW_HECHOS_TRANSACCIONES AS
 SELECT 
---  t.tranIdTarjeta,
-    s.solEmpId AS tranEmpIdEmisor,
-    s.solRedId AS tranRedId,
-    
-    t.tranFecha,
-    t.tranPaisId,
-    t.tranImporte
-FROM Transacciones t
-INNER JOIN Solicitudes s
-ON t.tranIdTarjeta = s.solIdTarjeta
+    S.solEmpId AS tranEmpIdEmisor,
+    S.solRedId AS tranRedId,
+    T.tranFecha,
+    T.tranPaisId,
+    T.tranImporte AS ImporteNacional,
+    CAST(T.tranImporte / VIND.ImporteDolar AS NUMERIC(10,2)) AS ImporteDolar
+FROM Transacciones AS T
+INNER JOIN Solicitudes AS S 
+    ON T.tranIdTarjeta = S.solIdTarjeta
+INNER JOIN VW_IMPORTE_NACIONAL_DOLAR AS VIND 
+    ON VIND.tranPaisId = T.tranPaisId;
 GO
 
 --COLOCACIONES
